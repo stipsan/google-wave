@@ -7,8 +7,13 @@ import DateComponent from './date'
 import {sanityFetch} from '@/sanity/lib/fetch'
 import {moreStoriesQuery} from '@/sanity/lib/queries'
 
-export default async function MoreStories(params: {skip: string; limit: number}) {
-  const data = await sanityFetch({query: moreStoriesQuery, params})
+export default async function MoreStories(props: {
+  skip: string
+  limit: number
+  lastLiveEventId: string | string[] | null | undefined
+}) {
+  const {lastLiveEventId, ...params} = props
+  const data = await sanityFetch({query: moreStoriesQuery, params, lastLiveEventId})
 
   return (
     <>

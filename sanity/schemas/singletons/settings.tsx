@@ -4,6 +4,7 @@ import {defineArrayMember, defineField, defineType} from 'sanity'
 import * as demo from '@/sanity/lib/demo'
 
 export default defineType({
+  liveEdit: true,
   name: 'settings',
   title: 'Settings',
   type: 'document',

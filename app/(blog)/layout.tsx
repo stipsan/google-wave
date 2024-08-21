@@ -14,10 +14,12 @@ import * as demo from '@/sanity/lib/demo'
 import {sanityFetch} from '@/sanity/lib/fetch'
 import {settingsQuery} from '@/sanity/lib/queries'
 import {resolveOpenGraphImage} from '@/sanity/lib/utils'
+import LiveSubscription from './live-subscription'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await sanityFetch({
     query: settingsQuery,
+    lastLiveEventId: undefined,
     // Metadata should never contain stega
     stega: false,
   })
@@ -53,7 +55,7 @@ const inter = Inter({
 })
 
 async function Footer() {
-  const data = await sanityFetch({query: settingsQuery})
+  const data = await sanityFetch({query: settingsQuery, lastLiveEventId: undefined})
   const footer = data?.footer || []
 
   return (
@@ -102,6 +104,9 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
           </Suspense>
         </section>
         {draftMode().isEnabled && <VisualEditing />}
+        <Suspense>
+          <LiveSubscription />
+        </Suspense>
         <SpeedInsights />
       </body>
     </html>

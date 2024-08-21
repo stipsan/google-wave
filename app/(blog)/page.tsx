@@ -67,12 +67,18 @@ function HeroPost({
   )
 }
 
-export default async function Page() {
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: {[key: string]: string | string[] | undefined}
+}) {
+  const {lastLiveEventId} = searchParams
   const [settings, heroPost] = await Promise.all([
     sanityFetch({
       query: settingsQuery,
+      lastLiveEventId,
     }),
-    sanityFetch({query: heroQuery}),
+    sanityFetch({query: heroQuery, lastLiveEventId}),
   ])
 
   return (
@@ -96,7 +102,7 @@ export default async function Page() {
             More Stories
           </h2>
           <Suspense>
-            <MoreStories skip={heroPost._id} limit={100} />
+            <MoreStories skip={heroPost._id} limit={100} lastLiveEventId={lastLiveEventId} />
           </Suspense>
         </aside>
       )}

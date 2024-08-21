@@ -17,6 +17,7 @@ import authorType from './author'
  */
 
 export default defineType({
+  liveEdit: true,
   name: 'post',
   title: 'Post',
   icon: DocumentTextIcon,

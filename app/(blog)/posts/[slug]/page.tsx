@@ -18,6 +18,7 @@ import {resolveOpenGraphImage} from '@/sanity/lib/utils'
 
 type Props = {
   params: {slug: string}
+  searchParams: {[key: string]: string | string[] | undefined}
 }
 
 const postSlugs = defineQuery(`*[_type == "post" && defined(slug.current)]{"slug": slug.current}`)
@@ -27,14 +28,16 @@ export async function generateStaticParams() {
     query: postSlugs,
     perspective: 'published',
     stega: false,
+    lastLiveEventId: undefined,
   })
 }
 
 export async function generateMetadata(
-  {params}: Props,
+  {params, searchParams}: Props,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const post = await sanityFetch({query: postQuery, params, stega: false})
+  const {lastLiveEventId} = searchParams
+  const post = await sanityFetch({query: postQuery, params, stega: false, lastLiveEventId})
   const previousImages = (await parent).openGraph?.images || []
   const ogImage = resolveOpenGraphImage(post?.coverImage)
 
@@ -48,10 +51,11 @@ export async function generateMetadata(
   } satisfies Metadata
 }
 
-export default async function PostPage({params}: Props) {
+export default async function PostPage({params, searchParams}: Props) {
+  const {lastLiveEventId} = searchParams
   const [post, settings] = await Promise.all([
-    sanityFetch({query: postQuery, params}),
-    sanityFetch({query: settingsQuery}),
+    sanityFetch({query: postQuery, params, lastLiveEventId}),
+    sanityFetch({query: settingsQuery, lastLiveEventId}),
   ])
 
   if (!post?._id) {
@@ -95,7 +99,7 @@ export default async function PostPage({params}: Props) {
           Recent Stories
         </h2>
         <Suspense>
-          <MoreStories skip={post._id} limit={2} />
+          <MoreStories skip={post._id} limit={2} lastLiveEventId={lastLiveEventId} />
         </Suspense>
       </aside>
     </div>
